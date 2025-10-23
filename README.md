@@ -30,6 +30,7 @@ $$
 
 #### Versão discreta das equações diferenciais
 Na forma discreta, as equações são atualizadas a cada passo de tempo \( $\Delta t$ \), representando a evolução das populações **S**, **I** e **R** ao longo do tempo.
+
 $$
 \begin{aligned}
 S_{t+\Delta t} &= S_t + \Delta t \left( \nu N_t - \beta \frac{S_t I_t}{N_t} + \xi R_t - \mu S_t \right) \\
@@ -37,6 +38,7 @@ I_{t+\Delta t} &= I_t + \Delta t \left( \beta \frac{S_t I_t}{N_t} - \gamma I_t -
 R_{t+\Delta t} &= R_t + \Delta t \left( \gamma I_t - \xi R_t - \mu R_t \right) \\
 \end{aligned}
 $$
+
 Quanto menor $\Delta t$, (por exemplo, 0.01 dias), mais precisa em relação a sua forma contínua.
 
 ---
