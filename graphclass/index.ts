@@ -1,9 +1,14 @@
-import { Grafo } from "./Grafo";
+import { Graph } from "./Graph";
 
-const g = new Grafo();
+const g = new Graph();
 
-g.adicionarAresta("A", "B");
-g.adicionarAresta("A", "C");
-g.adicionarAresta("B", "D");
+g.addArest("A", "B");
+g.addArest("A", "C");
+g.addArest("B", "D");
+g.addArest("C", "D");
 
+console.log("Graph:");
 g.exibir();
+
+console.log("\nDFS in A:");
+g.dfs("A");
