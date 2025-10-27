@@ -1,14 +1,6 @@
 
 class SIRS {
-    private _susceptible: number = 0;
-    public get susceptible(): number {
-        return this._susceptible;
-    }
-    public set susceptible(value: number) {
-        if(this._susceptible < 0) throw RangeError("The value of susceptible individuals should be greater than 0.");
-        this._susceptible = value;
-    }
-
+    susceptible: number;
     infected: number;
     recovered: number;
 
@@ -40,6 +32,38 @@ class SIRS {
         this.immunityLossRate = immunityLossRate;
         this.mortalityRate = mortalityRate;
         this.natalityRate = natalityRate;
+    }
+
+    updateState(deltaT: number) {
+        const population = this.susceptible + this.infected + this.recovered;
+
+        const dS = deltaT * (
+            this.natalityRate * population
+            - this.infectionRate * ((this.susceptible * this.infected) / population)
+            + this.immunityLossRate * this.recovered
+            - this.mortalityRate * this.susceptible
+        );
+
+        const dI = deltaT * (
+            this.infectionRate * ((this.susceptible * this.infected) / population)
+            - this.recoveringRate * this.infected
+            - this.mortalityRate * this.infected
+        );
+
+        const dR = deltaT * (
+            this.recoveringRate * this.infected
+            - this.immunityLossRate * this.recovered
+            - this.mortalityRate * this.recovered
+        );
+
+        this.susceptible += dS;
+        this.infected += dI;
+        this.recovered += dR;
+
+        // Prevent negative values caused by float numbers inaccuracies
+        if (this.susceptible < 0) this.susceptible = 0;
+        if (this.infected < 0) this.infected = 0;
+        if (this.recovered < 0) this.recovered = 0;
     }
 }
 
