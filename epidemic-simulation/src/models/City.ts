@@ -1,6 +1,4 @@
-import SIRS from "./SIRS";
-
-class City {
+export class City {
     name: string;
     population: number;
 

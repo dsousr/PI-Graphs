@@ -1,3 +1,3 @@
-import { startGraph } from "./visualization/SimulationRenderer";
+import { startGraph } from "./visualization/Renderer";
 
 startGraph();

@@ -1,8 +1,10 @@
+import {  }
 
 class SIRS {
     susceptible: number;
     infected: number;
     recovered: number;
+    city: City;
 
     infectionRate: number;
     recoveringRate: number;
