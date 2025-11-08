@@ -1,15 +1,29 @@
-export class City {
-    name: string;
-    population: number;
+import type { SIRSGroups } from "./SIRSModel";
 
-    constructor(name: string, population: number) {
+export default class City {
+    readonly id: string | number;
+    name: string;
+    groups: SIRSGroups; // represents population states (susceptible, infected, recovered)
+
+    constructor(
+        id: string | number,
+        groups: Partial<SIRSGroups> = {},
+        name: string
+    ) {
+        this.id = id;
         this.name = name;
-        this.population = population;
+        this.groups = {
+            susceptible: groups.susceptible ?? 0,
+            infected: groups.infected ?? 0,
+            recovered: groups.recovered ?? 0
+        };
     }
 
-    updateState() {
-        
+    get population(): number {
+        return this.groups.susceptible + this.groups.infected + this.groups.recovered;
+    }
+
+    clonePopulationState(): SIRSGroups {
+        return { ...this.groups };
     }
 }
-
-export default City;
