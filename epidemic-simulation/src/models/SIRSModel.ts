@@ -1,27 +1,16 @@
-export type SIRSGroups = { susceptible: number; infected: number; recovered: number };
-
 export default class SIRSModel {
     infectionRate: number;
     recoveringRate: number;
-    immunityRate: number;
     immunityLossRate: number;
     mortalityRate: number;
     natalityRate: number;
 
-    constructor(
-        infectionRate: number = 0,
-        recoveringRate: number = 0,
-        immunityRate: number = 0,
-        immunityLossRate: number = 0,
-        mortalityRate: number = 0,
-        natalityRate: number = 0
-    ) {
-        this.infectionRate = infectionRate;
-        this.recoveringRate = recoveringRate;
-        this.immunityRate = immunityRate;
-        this.immunityLossRate = immunityLossRate;
-        this.mortalityRate = mortalityRate;
-        this.natalityRate = natalityRate;
+    constructor(params: SIRSParameters = {}) {
+        this.infectionRate = params.infectionRate ?? 0;
+        this.recoveringRate = params.recoveringRate ?? 0;
+        this.immunityLossRate = params.immunityLossRate ?? 0;
+        this.mortalityRate = params.mortalityRate ?? 0;
+        this.natalityRate = params.natalityRate ?? 0;
     }
 
     updateState(groups: SIRSGroups, deltaT: number) : SIRSGroups {
@@ -61,4 +50,18 @@ export default class SIRSModel {
 
         return { susceptible, infected, recovered };
     }
+}
+
+export interface SIRSGroups { 
+    susceptible: number; 
+    infected: number; 
+    recovered: number; 
+};
+
+export interface SIRSParameters {
+    infectionRate?: number;
+    recoveringRate?: number;
+    immunityLossRate?: number;
+    mortalityRate?: number;
+    natalityRate?: number;
 }

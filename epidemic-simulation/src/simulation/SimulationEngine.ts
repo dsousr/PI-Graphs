@@ -1,4 +1,4 @@
-import EpidemicSystem from "../models/EpidemicSystem";
+import EpidemicNetworkSystem from "../models/EpidemicNetworkSystem";
 import City from "../models/City";
 
 export interface SimulationObserver {
@@ -6,11 +6,11 @@ export interface SimulationObserver {
 }
 
 export default class SimulationEngine {
-    private readonly system: EpidemicSystem;
+    private readonly system: EpidemicNetworkSystem;
     private readonly observers = new Set<SimulationObserver>();
     private tickCount = 0;
 
-    constructor(system: EpidemicSystem) {
+    constructor(system: EpidemicNetworkSystem) {
         this.system = system;
     }
 
