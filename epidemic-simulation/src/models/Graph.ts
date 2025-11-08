@@ -41,11 +41,14 @@ export default class Graph {
     return Array.from(this.adjacency.keys());
   }
 
- 
   getNeighbors(vert: Vertex): Edge[] {
     return this.adjacency.get(vert) ?? [];
   }
 
+  // This will avoid graph being mutated from outside
+  getAdjacencyView(): ReadonlyMap<Vertex, ReadonlyArray<Edge>> {
+    return this.adjacency;
+  }
  
   dfs(init: Vertex, found: Set<Vertex> = new Set()): void {
     if (found.has(init)) return;

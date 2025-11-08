@@ -1,7 +1,8 @@
 import cytoscape from "cytoscape";
 import "./style.css";
+import type { SimulationSnapshot } from "../simulation/SimulationEngine";
 
-export function startGraph() {
+export function renderGraph(snapshot: SimulationSnapshot) {
     let paused = false;
 
     const cy = cytoscape({

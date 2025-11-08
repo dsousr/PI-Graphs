@@ -68,6 +68,10 @@ export default class EpidemicNetworkSystem {
         }
     }
 
+    getGraphSnapshot(): ReadonlyMap<Vertex, ReadonlyArray<Edge>> {
+        return this.graph.getAdjacencyView();
+    }
+
     print(): void {
         console.log("=== Epidemic System State ===");
 

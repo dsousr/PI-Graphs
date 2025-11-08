@@ -49,7 +49,7 @@ export default class SIRSModel {
         if (recovered < 0) recovered = 0;
 
         return { susceptible, infected, recovered };
-    }
+    }   
 }
 
 export interface SIRSGroups { 
