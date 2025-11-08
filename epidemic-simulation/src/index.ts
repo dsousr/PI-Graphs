@@ -3,7 +3,7 @@ import EpidemicNetworkSystem from "./models/EpidemicNetworkSystem";
 import SIRSModel from "./models/SIRSModel";
 import ConsoleObserver from "./simulation/ConsoleObserver";
 import SimulationEngine, { type SimulationSnapshot } from "./simulation/SimulationEngine";
-import { renderGraph } from "./visualization/Renderer";
+import Renderer from "./visualization/Renderer";
 
 //startGraph();
 
