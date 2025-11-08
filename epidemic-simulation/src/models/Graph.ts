@@ -1,57 +1,53 @@
-type Vert = string | number;
+type Vertex = string | number;
 
-type Edge = { neighbor: Vert; weight: number };
+type Edge = { neighbor: Vertex; weight: number };
 
 export class Graph {
-  private adjacenc: Map<Vert, Edge[]>;
+  private adjacency: Map<Vertex, Edge[]>;
 
   constructor() {
-    this.adjacenc = new Map();
+    this.adjacency = new Map();
   }
 
-  addVert(vert: Vert): void {
-    if (!this.adjacenc.has(vert)) {
-      this.adjacenc.set(vert, []);
+  addVertex(vertex: Vertex): void {
+    if (!this.adjacency.has(vertex)) {
+      this.adjacency.set(vertex, []);
     }
   }
 
-  addArest(v1: Vert, v2: Vert, weight: number = 1): void {
-    this.addVert(v1);
-    this.addVert(v2);
+  addEdge(v1: Vertex, v2: Vertex, weight: number = 1): void {
+    this.addVertex(v1);
+    this.addVertex(v2);
 
-    const neighbors1 = this.adjacenc.get(v1)!;
-    const neighbors2 = this.adjacenc.get(v2)!;
-
-    neighbors1.push({ neighbor: v2, weight });
-    neighbors2.push({ neighbor: v1, weight });
+    this.adjacency.get(v1)!.push({ neighbor: v2, weight });
+    this.adjacency.get(v2)!.push({ neighbor: v1, weight });
   }
 
-  addArestDirect(origin: Vert, destin: Vert, weight: number = 1): void {
-    this.addVert(origin);
-    this.addVert(destin);
+  addDirectedEdge(origin: Vertex, destination: Vertex, weight: number = 1): void {
+    this.addVertex(origin);
+    this.addVertex(destination);
 
-    const neighbors = this.adjacenc.get(origin)!;
-    neighbors.push({ neighbor: destin, weight });
+    this.adjacency.get(origin)!.push({ neighbor: destination, weight });
   }
 
-  exibir(): void {
-    for (const [vert, edges] of this.adjacenc.entries()) {
+  print(): void {
+    for (const [vert, edges] of this.adjacency.entries()) {
       const text = edges.map(e => `${e.neighbor}(${e.weight})`).join(", ");
       console.log(`${vert} -> ${text}`);
     }
   }
 
-  getVertices(): Vert[] {
-    return Array.from(this.adjacenc.keys());
+  getVertex(): Vertex[] {
+    return Array.from(this.adjacency.keys());
   }
 
  
-  getNeighbor(vert: Vert): Edge[] {
-    return this.adjacenc.get(vert) ?? [];
+  getNeighbor(vert: Vertex): Edge[] {
+    return this.adjacency.get(vert) ?? [];
   }
 
  
-  dfs(init: Vert, found: Set<Vert> = new Set()): void {
+  dfs(init: Vertex, found: Set<Vertex> = new Set()): void {
     if (found.has(init)) return;
     console.log(init);
     found.add(init);
@@ -61,9 +57,9 @@ export class Graph {
     }
   }
 
-  bfs(init: Vert): void {
-    const visited = new Set<Vert>();
-    const queue: Vert[] = [init];
+  bfs(init: Vertex): void {
+    const visited = new Set<Vertex>();
+    const queue: Vertex[] = [init];
 
     visited.add(init);
 
