@@ -1,10 +1,7 @@
-import {  }
-
-class SIRS {
+export default class SIRS {
     susceptible: number;
     infected: number;
     recovered: number;
-    city: City;
 
     infectionRate: number;
     recoveringRate: number;
@@ -36,8 +33,12 @@ class SIRS {
         this.natalityRate = natalityRate;
     }
 
+    getPopulation(): number {
+        return this.susceptible + this.infected + this.recovered;
+    }
+
     updateState(deltaT: number) {
-        const population = this.susceptible + this.infected + this.recovered;
+        const population = this.getPopulation();
 
         const dS = deltaT * (
             this.natalityRate * population
@@ -67,7 +68,16 @@ class SIRS {
         if (this.infected < 0) this.infected = 0;
         if (this.recovered < 0) this.recovered = 0;
     }
+
+    removePeople(removedSusceptible: number, removedInfected: number, removedRecovered: number) {
+        this.susceptible = Math.max(0, this.susceptible - removedSusceptible);
+        this.infected = Math.max(0, this.infected - removedInfected);
+        this.recovered = Math.max(0, this.recovered - removedRecovered);
+    }
+
+    addPeople(newSusceptible: number, newInfected: number, newRecovered: number) {
+        this.susceptible += newSusceptible;
+        this.infected += newInfected;
+        this.recovered += newRecovered;
+    }    
 }
-
-
-export default SIRS;
