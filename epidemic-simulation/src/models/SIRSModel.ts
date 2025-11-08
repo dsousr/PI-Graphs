@@ -49,7 +49,22 @@ export default class SIRSModel {
         if (recovered < 0) recovered = 0;
 
         return { susceptible, infected, recovered };
-    }   
+    }
+    
+    getBasicReproductionNumber(): number {
+        // R0 > 1 => each infected person infects more than one person on average (epidemic spreads)
+        // R0 < 1 => each infected person infects less than one person on average (epidemic dies out)
+        // R0 == 1 => each infected person infects one person on average (disease remains stable)
+        const denominator = this.recoveringRate + this.mortalityRate;
+        return denominator > 0 ? this.infectionRate / denominator : 0;
+    }
+
+    getEffectiveReproductionNumber(groups: SIRSGroups): number {
+        const population = groups.susceptible + groups.infected + groups.recovered;
+        if (population === 0) return 0;
+        const R0 = this.getBasicReproductionNumber();
+        return R0 * (groups.susceptible / population);
+    }
 }
 
 export interface SIRSGroups { 

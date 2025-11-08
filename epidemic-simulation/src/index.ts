@@ -7,16 +7,37 @@ import { renderGraph } from "./visualization/Renderer";
 
 //startGraph();
 
-const sirsModel = new SIRSModel({
+// Epidemic growth (R0 > 1) // 3.33
+const epidemicModel = new SIRSModel({
     infectionRate: 10,
-    immunityLossRate: 1/2,
+    recoveringRate: 1,
+    immunityLossRate: 0.5,
     mortalityRate: 2,
-    natalityRate: 2,
-    recoveringRate: 1
+    natalityRate: 2
 });
-const system = new EpidemicNetworkSystem(sirsModel);
-system.addCity(new City("A", { susceptible: 900, infected: 1, recovered: 0 }));
-system.addCity(new City("B", { susceptible: 500, infected: 0, recovered: 0 }));
+
+// Stable equilibrium (R0 = 1) // 1.0
+const stableModel = new SIRSModel({
+    infectionRate: 3,
+    recoveringRate: 1,
+    immunityLossRate: 0.5,
+    mortalityRate: 2,
+    natalityRate: 2
+});
+
+// Disease dies out (R0 < 1) // 0.67
+const extinctionModel = new SIRSModel({
+    infectionRate: 2,
+    recoveringRate: 1,
+    immunityLossRate: 0.5,
+    mortalityRate: 2,
+    natalityRate: 2
+});
+
+
+const system = new EpidemicNetworkSystem(stableModel);
+system.addCity(new City("A", { susceptible: 900, infected: 10, recovered: 0 }));
+system.addCity(new City("B", { susceptible: 500, infected: 15, recovered: 0 }));
 system.addCity(new City("C", { susceptible: 800, infected: 0, recovered: 0 }));
 system.addCity(new City("D", { susceptible: 1000, infected: 0, recovered: 0 }));
 system.addEdge("A", "B", 40);

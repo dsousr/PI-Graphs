@@ -1,6 +1,7 @@
 import EpidemicNetworkSystem from "../models/EpidemicNetworkSystem";
 import City from "../models/City";
 import type { Edge, Vertex } from "../models/Graph";
+import type SIRSModel from "../models/SIRSModel";
 
 export default class SimulationEngine {
     private readonly system: EpidemicNetworkSystem;
@@ -29,7 +30,8 @@ export default class SimulationEngine {
         const snapshot: SimulationSnapshot = {
             cities: citiesSnapshot,
             edges,
-            elapsedTime: this.elapsedTime
+            elapsedTime: this.elapsedTime,
+            model: this.system.model
         };
 
         for (const observer of this.observers) {
@@ -48,6 +50,7 @@ export interface SimulationSnapshot {
     cities: City[];
     edges: ReadonlyMap<Vertex, ReadonlyArray<Edge>>;
     elapsedTime: number; // total "days" elapsed (or any other time unit used)
+    model: SIRSModel;
 }
 
 export interface SimulationObserver {
