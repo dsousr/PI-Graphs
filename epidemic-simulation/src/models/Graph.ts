@@ -1,8 +1,8 @@
-type Vertex = string | number;
+export type Vertex = string | number;
 
-type Edge = { neighbor: Vertex; weight: number };
+export type Edge = { neighbor: Vertex; weight: number };
 
-export class Graph {
+export default class Graph {
   private adjacency: Map<Vertex, Edge[]>;
 
   constructor() {
@@ -37,12 +37,12 @@ export class Graph {
     }
   }
 
-  getVertex(): Vertex[] {
+  getVertices(): Vertex[] {
     return Array.from(this.adjacency.keys());
   }
 
  
-  getNeighbor(vert: Vertex): Edge[] {
+  getNeighbors(vert: Vertex): Edge[] {
     return this.adjacency.get(vert) ?? [];
   }
 
@@ -52,7 +52,7 @@ export class Graph {
     console.log(init);
     found.add(init);
 
-    for (const { neighbor } of this.getNeighbor(init)) {
+    for (const { neighbor } of this.getNeighbors(init)) {
       this.dfs(neighbor, found);
     }
   }
@@ -67,7 +67,7 @@ export class Graph {
       const vertex = queue.shift()!;
       console.log(vertex);
 
-      for (const { neighbor } of this.getNeighbor(vertex)) {
+      for (const { neighbor } of this.getNeighbors(vertex)) {
         if (!visited.has(neighbor)) {
           visited.add(neighbor);
           queue.push(neighbor);
