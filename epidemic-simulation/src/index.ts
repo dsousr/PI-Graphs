@@ -36,10 +36,10 @@ const extinctionModel = new SIRSModel({
 
 
 const system = new EpidemicNetworkSystem(stableModel);
-system.addCity(new City("A", { susceptible: 900, infected: 10, recovered: 0 }));
-system.addCity(new City("B", { susceptible: 500, infected: 15, recovered: 0 }));
-system.addCity(new City("C", { susceptible: 800, infected: 0, recovered: 0 }));
-system.addCity(new City("D", { susceptible: 1000, infected: 0, recovered: 0 }));
+system.addCity(new City("A", 0.01, { susceptible: 900, infected: 10, recovered: 0 }));
+system.addCity(new City("B", 0.05, { susceptible: 500, infected: 15, recovered: 0 }));
+system.addCity(new City("C", 0.10, { susceptible: 800, infected: 0, recovered: 0 }));
+system.addCity(new City("D", 0.05, { susceptible: 1000, infected: 0, recovered: 0 }));
 system.addEdge("A", "B", 40);
 system.addEdge("A", "C", 20);
 system.addEdge("B", "D", 50);

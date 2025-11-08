@@ -23,7 +23,7 @@ export default class SimulationEngine {
     private notifyObservers(): void {
         const citiesSnapshot = this.system
             .getCities()
-            .map(c => new City(c.id, c.clonePopulationState()));
+            .map(c => new City(c.id, c.outgoingFraction, c.clonePopulationState()));
 
         const edges = this.system.getGraphSnapshot();
 
@@ -31,7 +31,7 @@ export default class SimulationEngine {
             cities: citiesSnapshot,
             edges,
             elapsedTime: this.elapsedTime,
-            model: this.system.model
+            model: this.system.model,
         };
 
         for (const observer of this.observers) {

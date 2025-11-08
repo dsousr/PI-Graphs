@@ -4,16 +4,28 @@ import type { Edge, Vertex } from "./Graph";
 import type { SIRSGroups } from "./SIRSModel";
 import type SIRSModel from "./SIRSModel";
 
+export interface OutgoingFlow {
+    to: Vertex;
+    groups: SIRSGroups; // people moving along this edge
+}
+
+export interface TransitFlow {
+    from: Vertex;
+    to: Vertex;
+    groups: SIRSGroups; // people in transit
+    travelTime: number; // total time needed to reach
+    elapsedTime: number; // time already spent
+}
+
 export default class EpidemicNetworkSystem {
     public readonly model: SIRSModel;
     private readonly graph: Graph;
     private cities = new Map<Vertex, City>();
-    private readonly travelFraction: number; // #todo: update, decide how to implement travel logic
+    private outgoingFlows = new Map<Vertex, OutgoingFlow[]>(); // { fromCity: { toCity: SIRSGroups } }
 
-    constructor(model: SIRSModel, travelFraction: number = 0.01) {
+    constructor(model: SIRSModel) {
         this.model = model;
         this.graph = new Graph();
-        this.travelFraction = travelFraction;
     }
 
     addCity(city: City): void {
@@ -38,11 +50,11 @@ export default class EpidemicNetworkSystem {
         return this.cities.get(id);
     }
 
-    addEdge(a: Vertex, b: Vertex, weight = 1): void {
+    addEdge(a: Vertex, b: Vertex, distance = 1): void {
         if (!this.hasCity(a) || !this.hasCity(b)) {
             throw new Error(`Cannot connect '${a}' and '${b}': one or both cities not found.`);
         }
-        this.graph.addEdge(a, b, weight);
+        this.graph.addEdge(a, b, distance);
     }
 
     getNeighbors(id: Vertex): Edge[] {
@@ -57,10 +69,9 @@ export default class EpidemicNetworkSystem {
         this.updateInfections(deltaT);
     }
 
-    private movePopulation(): void {
-        console.debug("Population moved");
-        // TODO: implementing ... //
+   private movePopulation(): void {
     }
+
 
     private updateInfections(deltaT: number): void {
         for (const city of this.cities.values()) {
