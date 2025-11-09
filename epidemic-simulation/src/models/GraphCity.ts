@@ -1,8 +1,21 @@
+import type { SIRSGroups } from "./SIRSModel";
+
 export type Vertex = string | number;
 
-export type Edge = { neighbor: Vertex; weight: number };
+export interface TransitFlow { //usar
+    to: Vertex;
+    groups: SIRSGroups; // people in transit
+    travelTime: number; // total time needed to reach
+    elapsedTime: number; // time already spent
+}
 
-export default class Graph {
+export type Edge = { 
+  neighbor: Vertex; 
+  weight: number;
+  flow?: TransitFlow;
+};
+
+export default class GraphCity {
   private adjacency: Map<Vertex, Edge[]>;
 
   constructor() {

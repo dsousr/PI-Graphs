@@ -1,6 +1,6 @@
 import EpidemicNetworkSystem from "../models/EpidemicNetworkSystem";
 import City from "../models/City";
-import type { Edge, Vertex } from "../models/Graph";
+import type { Edge, Vertex } from "../models/GraphCity";
 import type SIRSModel from "../models/SIRSModel";
 
 export default class SimulationEngine {
