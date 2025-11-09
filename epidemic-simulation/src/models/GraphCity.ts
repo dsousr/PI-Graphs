@@ -2,11 +2,14 @@ import type { SIRSGroups } from "./SIRSModel";
 
 export type Vertex = string | number;
 
-export interface TransitFlow { //usar
-    to: Vertex;
-    groups: SIRSGroups; // people in transit
-    travelTime: number; // total time needed to reach
+export interface TransitFlow {
+    id: string; // unique identifier for this batch
+    from: Vertex; // origin city
+    to: Vertex; // destination city  
+    groups: SIRSGroups; // people in transit (always integers)
+    travelTime: number; // total time needed
     elapsedTime: number; // time already spent
+    departureTime: number; // when this batch started traveling
 }
 
 export type Edge = { 
