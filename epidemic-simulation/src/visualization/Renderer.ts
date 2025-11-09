@@ -61,9 +61,9 @@ export default class Renderer implements SimulationObserver {
         const elements: ElementDefinition[] = [];
 
         snapshot.cities.forEach((city, index) => {
-            const xOffset = (index % 5) * 200; // Adjust x position based on index
+            const xOffset = (index) * 200; // Adjust x position based on index
 
-            const yOffset = Math.floor(index / 5) * 200; // Adjust y position based on index
+            const yOffset = (index % 2) * 200; // Adjust y position based on index
             //essa linha add vertices
             elements.push({ data: { id: city.id.toString(), label: city.id }, position: { x: this.x + xOffset, y: this.y + yOffset }, locked: true });
             const edges = snapshot.edges.get(city.id);

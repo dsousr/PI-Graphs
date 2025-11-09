@@ -41,7 +41,7 @@ system.addCity(new City("B", 0.05, { susceptible: 500, infected: 15, recovered: 
 system.addCity(new City("C", 0.10, { susceptible: 800, infected: 0, recovered: 0 }));
 //system.addCity(new City("D", 0.05, { susceptible: 1000, infected: 0, recovered: 0 }));
 system.addEdge("A", "B", 40);
-system.addEdge("B", "C", 20);
+system.addEdge("B", "C", 30);
 system.addEdge("A", "C", 20);
 //system.addEdge("B", "D", 50);
 
