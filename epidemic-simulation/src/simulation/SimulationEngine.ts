@@ -34,7 +34,7 @@ export default class SimulationEngine {
             model: this.system.model,
         };
 
-        for (const observer of this.observers) {
+        for (const observer of this.observers) { //essa aqui
             observer.update(snapshot);
         }
     }
@@ -46,13 +46,13 @@ export default class SimulationEngine {
     }
 }
 
-export interface SimulationSnapshot {
+export interface SimulationSnapshot { //não alterar nenhum dado daqui
     cities: City[];
     edges: ReadonlyMap<Vertex, ReadonlyArray<Edge>>;
     elapsedTime: number; // total "days" elapsed (or any other time unit used)
     model: SIRSModel;
 }
 
-export interface SimulationObserver {
-    update(snapshot: SimulationSnapshot): void;
+export interface SimulationObserver { //Lembrar aqui
+    update(snapshot: SimulationSnapshot): void; //não alterar nada
 }

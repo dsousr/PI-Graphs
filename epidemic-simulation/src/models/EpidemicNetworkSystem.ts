@@ -9,7 +9,7 @@ export interface OutgoingFlow {
     groups: SIRSGroups; // people moving along this edge
 }
 
-export interface TransitFlow {
+export interface TransitFlow { //usar
     from: Vertex;
     to: Vertex;
     groups: SIRSGroups; // people in transit

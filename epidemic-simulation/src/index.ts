@@ -35,18 +35,22 @@ const extinctionModel = new SIRSModel({
 });
 
 
-const system = new EpidemicNetworkSystem(stableModel);
+const system = new EpidemicNetworkSystem(epidemicModel);
 system.addCity(new City("A", 0.01, { susceptible: 900, infected: 10, recovered: 0 }));
 system.addCity(new City("B", 0.05, { susceptible: 500, infected: 15, recovered: 0 }));
 system.addCity(new City("C", 0.10, { susceptible: 800, infected: 0, recovered: 0 }));
-system.addCity(new City("D", 0.05, { susceptible: 1000, infected: 0, recovered: 0 }));
+//system.addCity(new City("D", 0.05, { susceptible: 1000, infected: 0, recovered: 0 }));
 system.addEdge("A", "B", 40);
+system.addEdge("B", "C", 20);
 system.addEdge("A", "C", 20);
-system.addEdge("B", "D", 50);
+//system.addEdge("B", "D", 50);
 
 const engine = new SimulationEngine(system);
-engine.addObserver(new ConsoleObserver());
+//engine.addObserver(new ConsoleObserver());
 
+engine.addObserver(new Renderer());
+engine.step(1)
+/*
 for (let i = 0; i < 3000; i += 1) {
     engine.step(0.01);
-}
+}*/
