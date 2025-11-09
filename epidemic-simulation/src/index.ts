@@ -48,9 +48,9 @@ system.addEdge("A", "C", 20);
 const engine = new SimulationEngine(system);
 //engine.addObserver(new ConsoleObserver());
 
-engine.addObserver(new Renderer());
-engine.step(1)
-/*
-for (let i = 0; i < 3000; i += 1) {
-    engine.step(0.01);
-}*/
+//engine.addObserver(new Renderer());
+//engine.step(1)
+
+//for (let i = 0; i < 3000; i += 1) {
+    //engine.step(0.01);
+//}
