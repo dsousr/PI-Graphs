@@ -1,23 +1,20 @@
 import City from "./City";
 import GraphCity from "./GraphCity";
-import type { Edge, Vertex } from "./GraphCity";
+import type { Edge, TransitFlow, Vertex } from "./GraphCity";
 import type { SIRSGroups } from "./SIRSModel";
 import type SIRSModel from "./SIRSModel";
-
-export interface OutgoingFlow {
-    to: Vertex;
-    groups: SIRSGroups; // people moving along this edge
-}
 
 export default class EpidemicNetworkSystem {
     public readonly model: SIRSModel;
     private readonly graph: GraphCity;
     private cities = new Map<Vertex, City>();
-    private outgoingFlows = new Map<Vertex, OutgoingFlow[]>(); // { fromCity: { toCity: SIRSGroups } }
 
-    constructor(model: SIRSModel) {
+    travelSpeed = 1; // default: 1 distance unit / time unit
+
+    constructor(model: SIRSModel, travelSpeed = 1) {
         this.model = model;
         this.graph = new GraphCity();
+        this.travelSpeed = travelSpeed;
     }
 
     addCity(city: City): void {
@@ -57,13 +54,12 @@ export default class EpidemicNetworkSystem {
     }    
 
     step(deltaT: number): void {
-        this.movePopulation();
+        this.movePopulation(deltaT);
         this.updateInfections(deltaT);
     }
 
-   private movePopulation(): void {
+    private movePopulation(deltaT: number): void {
     }
-
 
     private updateInfections(deltaT: number): void {
         for (const city of this.cities.values()) {

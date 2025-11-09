@@ -12,7 +12,8 @@ export interface TransitFlow { //usar
 export type Edge = { 
   neighbor: Vertex; 
   weight: number;
-  flow?: TransitFlow;
+  movementFraction?: number; // fraction of origin's population that moves along this directed edge (per time unit)
+  flows?: TransitFlow[]; // people currently in transit along this edge
 };
 
 export default class GraphCity {
@@ -28,19 +29,32 @@ export default class GraphCity {
     }
   }
 
-  addEdge(v1: Vertex, v2: Vertex, weight: number = 1): void {
+  addEdge(
+    v1: Vertex,
+    v2: Vertex,
+    weight: number = 1,
+    fractionV1toV2: number = 0,
+    fractionV2toV1: number = 0
+  ): void {
     this.addVertex(v1);
     this.addVertex(v2);
 
-    this.adjacency.get(v1)!.push({ neighbor: v2, weight });
-    this.adjacency.get(v2)!.push({ neighbor: v1, weight });
+    this.adjacency.get(v1)!.push({ neighbor: v2, weight, movementFraction: fractionV1toV2 });
+    this.adjacency.get(v2)!.push({ neighbor: v1, weight, movementFraction: fractionV2toV1 });
   }
 
-  addDirectedEdge(origin: Vertex, destination: Vertex, weight: number = 1): void {
+  addDirectedEdge(origin: Vertex, destination: Vertex, weight: number = 1, movementFraction: number = 0): void {
     this.addVertex(origin);
     this.addVertex(destination);
 
-    this.adjacency.get(origin)!.push({ neighbor: destination, weight });
+    this.adjacency.get(origin)!.push({ neighbor: destination, weight, movementFraction });
+  }
+
+  updateEdgeMovementFraction(origin: Vertex, destination: Vertex, fraction: number): void {
+    const edges = this.adjacency.get(origin);
+    if (!edges) return;
+    const edgeToUpdate = edges.find(x => x.neighbor === destination);
+    if (edgeToUpdate) edgeToUpdate.movementFraction = fraction;
   }
 
   print(): void {

@@ -1,8 +1,7 @@
 import City from "./models/City";
 import EpidemicNetworkSystem from "./models/EpidemicNetworkSystem";
 import SIRSModel from "./models/SIRSModel";
-import ConsoleObserver from "./simulation/ConsoleObserver";
-import SimulationEngine, { type SimulationSnapshot } from "./simulation/SimulationEngine";
+import SimulationEngine from "./simulation/SimulationEngine";
 import Renderer from "./visualization/Renderer";
 
 //startGraph();

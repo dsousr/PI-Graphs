@@ -1,4 +1,4 @@
-import type { SimulationObserver, SimulationSnapshot } from "./SimulationEngine";
+import type { SimulationObserver, SimulationSnapshot } from "../simulation/SimulationEngine";
 
 export default class ConsoleObserver implements SimulationObserver {
     update(snapshot: SimulationSnapshot): void {
