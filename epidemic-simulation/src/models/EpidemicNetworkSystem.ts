@@ -39,11 +39,17 @@ export default class EpidemicNetworkSystem {
         return this.cities.get(id);
     }
 
-    addEdge(a: Vertex, b: Vertex, distance = 1): void {
-        if (!this.hasCity(a) || !this.hasCity(b)) {
-            throw new Error(`Cannot connect '${a}' and '${b}': one or both cities not found.`);
+    addEdge(
+        v1: Vertex,
+        v2: Vertex,
+        distance: number = 1,
+        fractionV1toV2: number = 0,
+        fractionV2toV1: number = 0
+    ): void {
+        if (!this.hasCity(v1) || !this.hasCity(v2)) {
+            throw new Error(`Cannot connect '${v1}' and '${v2}': one or both cities not found.`);
         }
-        this.graph.addEdge(a, b, distance);
+        this.graph.addEdge(v1, v2, distance, fractionV1toV2, fractionV2toV1);
     }
 
     getNeighbors(id: Vertex): Edge[] {
