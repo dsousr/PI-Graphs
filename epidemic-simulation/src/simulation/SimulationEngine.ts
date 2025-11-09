@@ -1,6 +1,6 @@
 import EpidemicNetworkSystem from "../models/EpidemicNetworkSystem";
 import City from "../models/City";
-import type { Edge, Vertex } from "../models/GraphCity";
+import type { Edge, TransitFlow, Vertex } from "../models/GraphCity";
 import type SIRSModel from "../models/SIRSModel";
 
 export default class SimulationEngine {
@@ -26,10 +26,12 @@ export default class SimulationEngine {
             .map(c => new City(c.id, c.clonePopulationState()));
 
         const edges = this.system.getGraphSnapshot();
+        const transitFlows = this.system.getAllTransitFlows();
 
         const snapshot: SimulationSnapshot = {
             cities: citiesSnapshot,
             edges,
+            transitFlows,
             elapsedTime: this.elapsedTime,
             model: this.system.model,
         };
@@ -46,10 +48,11 @@ export default class SimulationEngine {
     }
 }
 
-export interface SimulationSnapshot { //não alterar nenhum dado daqui
+export interface SimulationSnapshot {
     cities: City[];
     edges: ReadonlyMap<Vertex, ReadonlyArray<Edge>>;
-    elapsedTime: number; // total "days" elapsed (or any other time unit used)
+    transitFlows: TransitFlow[];
+    elapsedTime: number; //total "days" elapsed (or any other time unit used)
     model: SIRSModel;
 }
 
