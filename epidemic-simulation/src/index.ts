@@ -44,27 +44,51 @@ const nonChagingModel = new SIRSModel({
 });
 
 
-// Added travelSpeed (50 units/day) and movementInterval (1 day)
-const system = new EpidemicNetworkSystem(epidemicModel, 50, 1.0);
-system.addCity(new City("A", { susceptible: 5, infected: 500, recovered: 0 }));
-system.addCity(new City("B", { susceptible: 500, infected: 150, recovered: 0 }));
-system.addCity(new City("C", { susceptible: 800, infected: 0, recovered: 0 }));
-//system.addCity(new City("D", 0.05, { susceptible: 1000, infected: 0, recovered: 0 }));
+const initializeBigNetwork = (sirsModel: SIRSModel): EpidemicNetworkSystem => {
+    // added travelSpeed (50 units/day) and movementInterval (1 day/unit, for example)
+    const networkSystem = new EpidemicNetworkSystem(sirsModel, 50, 0.5);
+    networkSystem.addCity(new City("A", { susceptible: 1800, infected: 150, recovered: 50 }));
+    networkSystem.addCity(new City("B", { susceptible: 1200, infected: 600, recovered: 200 }));
+    networkSystem.addCity(new City("C", { susceptible: 900, infected: 100, recovered: 0 }));
+    networkSystem.addCity(new City("D", { susceptible: 50, infected: 10, recovered: 5 }));
+    networkSystem.addCity(new City("E", { susceptible: 400, infected: 300, recovered: 100 }));
+    networkSystem.addCity(new City("F", { susceptible: 1300, infected: 400, recovered: 100 }));
+    networkSystem.addCity(new City("G", { susceptible: 500, infected: 250, recovered: 125 }));
+    networkSystem.addCity(new City("H", { susceptible: 1600, infected: 200, recovered: 100 }));
 
-// Distances with travelSpeed=50:
-// A->B: 40/50 = 0.8 days travel time
-// B->C: 30/50 = 0.6 days travel time  
-// A->C: 20/50 = 0.4 days travel time
-system.addEdge("A", "B", 40, 0.02, 0.01);
-system.addEdge("B", "C", 30, 0.03, 0);
-system.addEdge("A", "C", 20, 0.01, 0.02);
+    // distances with travelSpeed=50
+    // A->B: 40/50 = 0.8 days travel time
+    // B->C: 30/50 = 0.6 days travel time  
+    // A->C: 20/50 = 0.4 days travel time
+    networkSystem.addEdge("A", "B", 400, 0.02, 0);
+    networkSystem.addEdge("B", "C", 30, 0.03, 0);
+    networkSystem.addEdge("A", "C", 20, 0.01, 0.02);
+    networkSystem.addEdge("C", "D", 50, 0.02, 0.01);
+    networkSystem.addEdge("C", "E", 70, 0.01, 0.03);
+    networkSystem.addEdge("B", "F", 80, 0.03, 0.01);
+    networkSystem.addEdge("A", "G", 90, 0.02, 0.02);
+    networkSystem.addEdge("D", "H", 60, 0.01, 0.01);
 
-const engine = new SimulationEngine(system);
+    return networkSystem;
+}
+
+const initializeTinyNetwork = (sirsModel: SIRSModel): EpidemicNetworkSystem => {
+    // added travelSpeed (50 units/day) and movementInterval (ex: 1 day)
+    const networkSystem = new EpidemicNetworkSystem(sirsModel, 50, 0.5);
+    networkSystem.addCity(new City("A", { susceptible: 5, infected: 500, recovered: 0 }));
+    networkSystem.addCity(new City("B", { susceptible: 500, infected: 150, recovered: 0 }));
+    networkSystem.addCity(new City("C", { susceptible: 100, infected: 0, recovered: 0 }));
+
+    networkSystem.addEdge("A", "B", 100, 0.02, 0);
+    networkSystem.addEdge("B", "C", 50, 0.03, 0);
+    networkSystem.addEdge("A", "C", 30, 0.01, 0.02);
+    return networkSystem;
+}
+
+const networkSystem = initializeTinyNetwork(epidemicModel);
+const engine = new SimulationEngine(networkSystem);
 engine.addObserver(new Renderer());
 engine.addObserver(new ConsoleObserver("active"));
-
-//engine.addObserver(new Renderer());
-//engine.step(1)
 
 // controle do botão
 const toggleBtn = document.querySelector(".min-screen") as HTMLElement;
@@ -77,8 +101,7 @@ toggleBtn?.addEventListener("click", () => {
 // Movement happens every 1.0 time units, disease updates every 0.01
 // People will travel in batches every day while disease spreads continuously
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-for (let i = 0; i < 1000; i += 1) {
-    engine.step(0.05);
-    await sleep(500);
-
+for (let i = 0; i < 10000; i += 1) {
+    engine.step(0.1);
+    await sleep(100);
 }

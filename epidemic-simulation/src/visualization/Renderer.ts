@@ -31,8 +31,8 @@ export default class Renderer implements SimulationObserver {
             particle = document.createElement("div");
             particle.className = "particle";
             particle.style.position = "absolute";
-            particle.style.width = "30px";
-            particle.style.height = "30px";
+            particle.style.width = "1.5rem";
+            particle.style.height = "1.5rem";
             particle.style.borderRadius = "50%";
             particle.style.display = "flex";
             particle.style.alignItems = "center";
@@ -79,13 +79,9 @@ export default class Renderer implements SimulationObserver {
             const elements: ElementDefinition[] = [];
 
             snapshot.cities.forEach((city, index) => {
-                const xOffset = index * 200;
-                const yOffset = (index % 2) * 200;
-                elements.push({
-                    data: { id: city.id.toString(), label: city.id },
-                    position: { x: this.x + xOffset, y: this.y + yOffset },
-                    locked: true,
-                });
+            elements.push({
+                data: { id: city.id.toString(), label: city.id },
+            });
                 const edges = snapshot.edges.get(city.id);
                 edges?.forEach((edge) => {
                     elements.push({
@@ -149,7 +145,12 @@ export default class Renderer implements SimulationObserver {
                         },
                     },
                 ],
-                layout: { name: "preset", fit: true },
+                layout: {
+                    name: "cose",
+                    animate: true,
+                    padding: 30,
+                    randomize: true,
+                },
             });
 
             const pauseBtn = document.getElementById("pauseBtn");
