@@ -76,6 +76,38 @@ const initializeBigNetwork = (
     return networkSystem;
 }
 
+const initializeBigNetworkWithInfectionOriginA = (
+    sirsModel: SIRSModel, 
+    travelSpeed: number, 
+    movimentInterval: number
+): EpidemicNetworkSystem => {
+    // added travelSpeed (50 units/day) and movementInterval (1 day/unit, for example)
+    const networkSystem = new EpidemicNetworkSystem(sirsModel, travelSpeed, movimentInterval);
+    networkSystem.addCity(new City("A", { susceptible: 1800, infected: 500, recovered: 50 }));
+    networkSystem.addCity(new City("B", { susceptible: 1200, infected: 0, recovered: 200 }));
+    networkSystem.addCity(new City("C", { susceptible: 900, infected: 0, recovered: 0 }));
+    networkSystem.addCity(new City("D", { susceptible: 50, infected: 0, recovered: 5 }));
+    networkSystem.addCity(new City("E", { susceptible: 400, infected: 0, recovered: 100 }));
+    networkSystem.addCity(new City("F", { susceptible: 1300, infected: 0, recovered: 100 }));
+    networkSystem.addCity(new City("G", { susceptible: 500, infected: 0, recovered: 125 }));
+    networkSystem.addCity(new City("H", { susceptible: 1600, infected: 0, recovered: 100 }));
+
+    // distances with travelSpeed=50
+    // A->B: 40/50 = 0.8 days travel time
+    // B->C: 30/50 = 0.6 days travel time  
+    // A->C: 20/50 = 0.4 days travel time
+    networkSystem.addEdge("A", "B", 400, 0.02, 0);
+    networkSystem.addEdge("B", "C", 30, 0.03, 0);
+    networkSystem.addEdge("A", "C", 20, 0.01, 0.02);
+    networkSystem.addEdge("C", "D", 50, 0.02, 0.01);
+    networkSystem.addEdge("C", "E", 70, 0.01, 0.03);
+    networkSystem.addEdge("B", "F", 80, 0.03, 0.01);
+    networkSystem.addEdge("A", "G", 90, 0.02, 0.02);
+    networkSystem.addEdge("D", "H", 60, 0.01, 0.01);
+
+    return networkSystem;
+}
+
 const initializeTinyNetwork = (
     sirsModel: SIRSModel, 
     travelSpeed: number, 
@@ -95,7 +127,8 @@ const initializeTinyNetwork = (
 
 const travelSpeed = 200; // units per delta
 const movementInterval = 0.08; // interval in which people go out to travel
-const networkSystem = initializeBigNetwork(epidemicModel, travelSpeed, movementInterval);
+//const networkSystem = initializeBigNetwork(epidemicModel, travelSpeed, movementInterval);
+const networkSystem = initializeBigNetworkWithInfectionOriginA(epidemicModel, travelSpeed, movementInterval);
 //const networkSystem = initializeTinyNetwork(epidemicModel, travelSpeed, movementInterval);
 const engine = new SimulationEngine(networkSystem);
 engine.addObserver(new Renderer());
@@ -114,7 +147,7 @@ toggleBtn?.addEventListener("click", () => {
 // Movement happens every 1.0 time units, disease updates every 0.01
 // People will travel in batches every day while disease spreads continuously
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-for (let i = 0; i < 10000; i += 1) {
+for (let i = 0; i < 100000; i += 1) {
     engine.step(0.0001);
     await sleep(0.001);
 
