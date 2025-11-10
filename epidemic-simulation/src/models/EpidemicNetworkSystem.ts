@@ -211,6 +211,10 @@ export default class EpidemicNetworkSystem {
         }
     }
 
+    getAllTransitBatches(): TransitFlow[] {
+        return this.graph.getAllTransitFlows();
+    }
+    
     getGraphSnapshot(): ReadonlyMap<Vertex, ReadonlyArray<Edge>> {
         return this.graph.getAdjacencyView();
     }

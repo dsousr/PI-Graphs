@@ -8,160 +8,172 @@ export default class Renderer implements SimulationObserver {
 
     private chart!: Chart;
     private dataHistory = {
-    labels: [] as string[],
-    susceptible: [] as number[],
-    infected: [] as number[],
-    recovered: [] as number[],
+        labels: [] as string[],
+        susceptible: [] as number[],
+        infected: [] as number[],
+        recovered: [] as number[],
     };
 
     private started = false;
     private paused = false;
     private cy!: cytoscape.Core;
     private container!: HTMLElement;
+    private particleMap = new Map<string, HTMLElement>();
 
     private x = 40;
     private y = 20;
 
     constructor() { }
 
-    private moveParticle(edgeId: string) {
-        if (this.paused) return;
-        const edge = this.cy.getElementById(edgeId);
-        if (!edge || !this.container) return;
+    private ensureParticle(batchId: string, color: string, count: number): HTMLElement {
+        let particle = this.particleMap.get(batchId);
+        if (!particle) {
+            particle = document.createElement("div");
+            particle.className = "particle";
+            particle.style.position = "absolute";
+            particle.style.width = "24px";
+            particle.style.height = "24px";
+            particle.style.borderRadius = "50%";
+            particle.style.display = "flex";
+            particle.style.alignItems = "center";
+            particle.style.justifyContent = "center";
+            particle.style.fontSize = "10px";
+            particle.style.color = "white";
+            particle.style.fontWeight = "bold";
+            particle.style.backgroundColor = color;
+            this.container.appendChild(particle);
+            this.particleMap.set(batchId, particle);
+        }
+        particle.textContent = count.toString();
+        return particle;
+    }
 
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        particle.style.width = '20px';
-        particle.style.height = '20px';
-        particle.style.borderRadius = '50%';
+    private updateParticlePosition(batch: any) {
+        const edge = this.cy.getElementById(batch.edgeId);
+        const srcPos = this.cy.getElementById(batch.source).renderedPosition();
+        const dstPos = this.cy.getElementById(batch.target).renderedPosition();
 
-        const cores = ['green', 'red', 'blue'];
-        particle.style.backgroundColor = cores[Math.floor(Math.random() * cores.length)];
+        const progress = Math.min(1, Math.max(0, batch.elapsedTime / batch.travelTime));
+        const x = srcPos.x + (dstPos.x - srcPos.x) * progress;
+        const y = srcPos.y + (dstPos.y - srcPos.y) * progress;
 
-        this.container.appendChild(particle);
+        const particle = this.particleMap.get(batch.id);
+        if (particle) {
+            particle.style.left = `${x - 12}px`;
+            particle.style.top = `${y - 12}px`;
+        }
+    }
 
-        const steps = 60;
-        const msPorKm = 300;
-        const dist = edge.data('distance') || 1;
-        const duration = msPorKm * dist;
-        let t = 0;
-
-        const interval = setInterval(() => {
-            if (this.paused) return;
-            t++;
-            const srcPos = this.cy.getElementById(edge.data('source')).renderedPosition();
-            const dstPos = this.cy.getElementById(edge.data('target')).renderedPosition();
-
-            const progress = t / steps;
-            const x = srcPos.x + (dstPos.x - srcPos.x) * progress;
-            const y = srcPos.y + (dstPos.y - srcPos.y) * progress;
-
-            particle.style.left = `${x - 10}px`;
-            particle.style.top = `${y - 10}px`;
-
-            if (t >= steps) {
-                clearInterval(interval);
+    private removeInactiveBatches(activeBatchIds: Set<string>) {
+        for (const [id, particle] of this.particleMap.entries()) {
+            if (!activeBatchIds.has(id)) {
                 particle.remove();
+                this.particleMap.delete(id);
             }
-        }, duration / steps);
+        }
     }
 
     update(snapshot: SimulationSnapshot) {
+        if (!this.started) {
+            this.container = document.getElementById("container")!;
+            const elements: ElementDefinition[] = [];
 
-        const elements: ElementDefinition[] = [];
-
-        snapshot.cities.forEach((city, index) => {
-            const xOffset = (index) * 200; // Adjust x position based on index
-
-            const yOffset = (index % 2) * 200; // Adjust y position based on index
-            //essa linha add vertices
-            elements.push({ data: { id: city.id.toString(), label: city.id }, position: { x: this.x + xOffset, y: this.y + yOffset }, locked: true });
-            const edges = snapshot.edges.get(city.id);
-            //add arestas
-            edges?.forEach(edge => {
+            snapshot.cities.forEach((city, index) => {
+                const xOffset = index * 200;
+                const yOffset = (index % 2) * 200;
                 elements.push({
-                    data: {
-                        id: `${city.id}${edge.neighbor}`,
-                        source: city.id,
-                        target: edge.neighbor.toString(),
-                        distance: edge.weight
-                    }
+                    data: { id: city.id.toString(), label: city.id },
+                    position: { x: this.x + xOffset, y: this.y + yOffset },
+                    locked: true,
+                });
+                const edges = snapshot.edges.get(city.id);
+                edges?.forEach((edge) => {
+                    elements.push({
+                        data: {
+                            id: `${city.id}${edge.neighbor}`,
+                            source: city.id,
+                            target: edge.neighbor.toString(),
+                            distance: edge.weight,
+                        },
+                    });
                 });
             });
-        });
-        console.log(elements)
-        if (!this.started) {
 
             const ctx = (document.getElementById('statusChart') as HTMLCanvasElement).getContext('2d')!;
             this.chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: [],
-                datasets: [
-                { label: 'Suscetíveis', data: [], borderColor: 'blue', fill: false },
-                { label: 'Infectados', data: [], borderColor: 'red', fill: false },
-                { label: 'Recuperados', data: [], borderColor: 'green', fill: false }
-                ]
-            },
-            options: {
-                animation: false,
-                scales: {
-                x: { title: { display: true, text: 'Tempo (dias)' } },
-                y: { title: { display: true, text: 'População' } }
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        { label: 'Suscetíveis', data: [], borderColor: 'blue', fill: false },
+                        { label: 'Infectados', data: [], borderColor: 'red', fill: false },
+                        { label: 'Recuperados', data: [], borderColor: 'green', fill: false }
+                    ]
+                },
+                options: {
+                    animation: false,
+                    scales: {
+                        x: { title: { display: true, text: 'Tempo (dias)' } },
+                        y: { title: { display: true, text: 'População' } }
+                    }
                 }
-            }
             });
-            
+
             this.container = document.getElementById('container')!;
+
             this.cy = cytoscape({
-                container: document.getElementById('cy'),
+                container: document.getElementById("cy"),
                 elements,
                 style: [
                     {
-                        selector: 'node',
+                        selector: "node",
                         style: {
-                            'background-color': 'black',
-                            'label': 'data(label)',
-                            'color': 'white',
-                            'font-weight': 'bold',
-                            'text-valign': 'center',
-                            'padding': '10px'
-                        }
+                            "background-color": "black",
+                            label: "data(label)",
+                            color: "white",
+                            "font-weight": "bold",
+                            "text-valign": "center",
+                            padding: "10px",
+                        },
                     },
                     {
-                        selector: 'edge',
+                        selector: "edge",
                         style: {
-                            'width': 4,
-                            'line-color': 'white',
-                            'target-arrow-shape': 'triangle',
-                            'label': 'data(distance)',
-                            'font-size': 14,
-                            'color': 'black',
-                            'text-rotation': 'autorotate'
-                        }
-                    }
+                            width: 4,
+                            "line-color": "white",
+                            "target-arrow-shape": "triangle",
+                            label: "data(distance)",
+                            "font-size": 14,
+                            color: "black",
+                            "text-rotation": "autorotate",
+                        },
+                    },
                 ],
-                layout: { name: 'preset', fit: true }
-
+                layout: { name: "preset", fit: true },
             });
 
-            // Disparar partículas
-            elements
-            .filter(e => e.data.source && e.data.target)
-            .forEach(e => {
-                if (e.data.id) {
-                    setInterval(() => this.moveParticle(e.data.id!), 1500);
-                }
-            });
-
-            const pauseBtn = document.getElementById('pauseBtn');
-            pauseBtn?.addEventListener('click', () => {
+            const pauseBtn = document.getElementById("pauseBtn");
+            pauseBtn?.addEventListener("click", () => {
                 this.paused = !this.paused;
                 if (pauseBtn instanceof HTMLElement) {
-                    pauseBtn.textContent = this.paused ? 'Retomar' : 'Pausar';
+                    pauseBtn.textContent = this.paused ? "Retomar" : "Pausar";
                 }
             });
+
             this.started = true;
         }
+
+        if (this.paused) return;
+
+        // Render active batches
+        const activeBatchIds = new Set<string>();
+        snapshot.transitBatches.forEach((batch: any) => {
+            const color = batch.color ?? "gray";
+            const particle = this.ensureParticle(batch.id, color, Math.round(batch.count));
+            this.updateParticlePosition(batch);
+            activeBatchIds.add(batch.id);
+        });
+
+        this.removeInactiveBatches(activeBatchIds);
     }
 }
