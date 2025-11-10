@@ -101,7 +101,7 @@ const engine = new SimulationEngine(networkSystem);
 engine.addObserver(new Renderer());
 const depthLevel = networkSystem.getDepthLevels("A");
 console.log("Depth levels from A:", depthLevel);
-//engine.addObserver(new ConsoleObserver("total"));
+engine.addObserver(new ConsoleObserver("levels", "A"));
 
 // controle do botão
 const toggleBtn = document.querySelector(".min-screen") as HTMLElement;
@@ -117,4 +117,6 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 for (let i = 0; i < 10000; i += 1) {
     engine.step(0.0001);
     await sleep(0.001);
+
+    if (i > 5000) break;
 }

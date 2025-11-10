@@ -1,13 +1,15 @@
 import type { SimulationObserver, SimulationSnapshot } from "../simulation/SimulationEngine";
 import type { TransitFlow, Edge, Vertex } from "../models/GraphCity";
 
-export type PrintMode = "daily" | "active" | "total";
+export type PrintMode = "daily" | "active" | "total" | "levels";
 
 export default class ConsoleObserver implements SimulationObserver {
     private readonly mode: PrintMode;
+    private readonly originVertex?: Vertex;
 
-    constructor(mode: PrintMode = "daily") {
+    constructor(mode: PrintMode = "daily", originVertex?: Vertex) {
         this.mode = mode;
+        this.originVertex = originVertex;
     }
 
     update(snapshot: SimulationSnapshot): void {
@@ -16,32 +18,68 @@ export default class ConsoleObserver implements SimulationObserver {
         const shouldPrint =
             this.mode === "daily" ||
             (this.mode === "active" && activeFlows.length > 0) ||
-            this.mode === "total";
+            this.mode === "total" ||
+            this.mode === "levels";
 
         if (!shouldPrint) return;
 
-        if (this.mode === "total") {
-            this.printTotals(snapshot.cities, activeFlows);
-        } else {
-            this.printHeader(snapshot.elapsedTime, snapshot.model.getBasicReproductionNumber());
-            this.printCityStates(snapshot.cities);
-            this.printConnections(snapshot.edges);
-            this.printTransitFlows(activeFlows);
-            this.printFooter();
+        switch (this.mode) {
+            case "total":
+                this.printTotals(snapshot.cities, activeFlows);
+                break;
+
+            case "levels":
+                if (!this.originVertex) {
+                    console.warn("ConsoleObserver (levels): origin vertex not defined.");
+                    return;
+                }
+                this.printDepthLevels(snapshot, this.originVertex);
+                break;
+
+            default:
+                this.printHeader(snapshot.elapsedTime, snapshot.model.getBasicReproductionNumber());
+                this.printCityStates(snapshot.cities);
+                this.printConnections(snapshot.edges);
+                this.printTransitFlows(activeFlows);
+                this.printFooter();
+                break;
         }
+    }
+
+    private printDepthLevels(snapshot: SimulationSnapshot, origin: Vertex): void {
+        const levels = snapshot.getDepthLevels(origin);
+        const day = snapshot.elapsedTime.toFixed(2); // ✅ show current day
+
+        console.log(`\n====== Day ${day} — Epidemic Spread by Levels (origin: ${origin}) ======\n`);
+
+        for (const [depth, vertices] of levels.entries()) {
+            let totalS = 0, totalI = 0, totalR = 0;
+
+            for (const v of vertices) {
+                const city = snapshot.cities.find(c => c.id === v);
+                if (!city) continue;
+                totalS += city.groups.susceptible;
+                totalI += city.groups.infected;
+                totalR += city.groups.recovered;
+            }
+
+            console.log(`Level ${depth}:`);
+            console.log(`  Cities: ${vertices.join(", ")}`);
+            console.log(`  S=${totalS.toFixed(0)}, I=${totalI.toFixed(0)}, R=${totalR.toFixed(0)}`);
+        }
+
+        console.log("=====================\n");
     }
 
     private printTotals(cities: SimulationSnapshot["cities"], flows: TransitFlow[]): void {
         let totalS = 0, totalI = 0, totalR = 0;
 
-        // Sum city populations
         for (const city of cities) {
             totalS += city.groups.susceptible;
             totalI += city.groups.infected;
             totalR += city.groups.recovered;
         }
 
-        // Sum people currently in transit
         for (const flow of flows) {
             totalS += flow.groups.susceptible;
             totalI += flow.groups.infected;

@@ -67,6 +67,7 @@ export default class SimulationEngine {
             elapsedTime: this.elapsedTime,
             model: this.system.model,
             transitBatches,
+            getDepthLevels: this.system.getDepthLevels.bind(this.system),
         };
 
         for (const observer of this.observers) {
@@ -87,6 +88,7 @@ export interface SimulationSnapshot {
     elapsedTime: number;
     model: SIRSModel;
     transitBatches: TransitBatchSnapshot[];
+    getDepthLevels(startId: Vertex): Map<number, Vertex[]>;
 }
 
 export interface TransitBatchSnapshot {
