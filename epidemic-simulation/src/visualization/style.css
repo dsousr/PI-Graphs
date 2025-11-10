@@ -28,8 +28,8 @@ body {
 
 #controls {
     position: fixed;
-    top: 40px;
-    left: 40px;
+    top: 20px;
+    left: 20px;
     z-index: 10;
     transition: .5s;
 }
@@ -46,4 +46,90 @@ button {
     cursor: pointer;
     border: none;
     border-radius: 20px;
+    background-color: rgb(85, 85, 255);
+}
+
+/*Minima mapa*/
+.container-graph {
+    box-sizing: border-box;
+    font-family: Arial;
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    height: 300px;
+    width: 400px;
+    padding: 20px;
+    border: solid black 4px;
+    border-radius: 10px;
+    background-color: rgb(145, 145, 255);
+    transition: .4s ease-in-out;
+}
+
+.graph {
+    height: 65%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+}
+
+.tools {
+    height: 35%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    background-color: rgb(184, 184, 255);
+    border-radius: 20px;
+}
+
+.inf-blocks {
+    font-weight: 800;
+    font-size: 2rem;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+}
+
+.b-green { background-color: rgb(195, 255, 104); }
+.b-red { background-color: rgb(255, 94, 94); }
+.b-blue { background-color: rgb(78, 78, 255); }
+
+button {
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.min-screen img {
+    width: 3rem;
+}
+
+.container-graph.minimized {
+    height: 100px;
+    width: 100px;
+    padding: 0;
+    overflow: hidden;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container-graph.minimized .tools{
+    background-color: transparent;
+}
+
+.container-graph.minimized .graph,
+.container-graph.minimized .tools .inf-blocks:not(.min-screen) {
+    display: none;
+}
+
+.container-graph.minimized .min-screen img {
+    width: 3rem;
 }

@@ -1,8 +1,18 @@
 import cytoscape, { type ElementDefinition } from "cytoscape";
+import { Chart } from "chart.js/auto";
+
 import "./style.css";
 import type { SimulationObserver, SimulationSnapshot } from "../simulation/SimulationEngine";
 
 export default class Renderer implements SimulationObserver {
+
+    private chart!: Chart;
+    private dataHistory = {
+    labels: [] as string[],
+    susceptible: [] as number[],
+    infected: [] as number[],
+    recovered: [] as number[],
+    };
 
     private started = false;
     private paused = false;
@@ -81,6 +91,27 @@ export default class Renderer implements SimulationObserver {
         });
         console.log(elements)
         if (!this.started) {
+
+            const ctx = (document.getElementById('statusChart') as HTMLCanvasElement).getContext('2d')!;
+            this.chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                { label: 'Suscetíveis', data: [], borderColor: 'blue', fill: false },
+                { label: 'Infectados', data: [], borderColor: 'red', fill: false },
+                { label: 'Recuperados', data: [], borderColor: 'green', fill: false }
+                ]
+            },
+            options: {
+                animation: false,
+                scales: {
+                x: { title: { display: true, text: 'Tempo (dias)' } },
+                y: { title: { display: true, text: 'População' } }
+                }
+            }
+            });
+            
             this.container = document.getElementById('container')!;
             this.cy = cytoscape({
                 container: document.getElementById('cy'),

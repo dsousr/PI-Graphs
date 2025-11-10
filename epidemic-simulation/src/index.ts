@@ -63,13 +63,22 @@ system.addEdge("A", "C", 20, 0.01, 0.02);
 const engine = new SimulationEngine(system);
 const consoleObserver = new ConsoleObserver("active");
 engine.addObserver(consoleObserver);
-
+engine.addObserver(new Renderer());
 
 //engine.addObserver(new Renderer());
 //engine.step(1)
 
 // Movement happens every 1.0 time units, disease updates every 0.01
 // People will travel in batches every day while disease spreads continuously
-for (let i = 0; i < 110; i += 1) {
+// Para não travar
+for (let i = 0; i < 3000; i += 1) {
     engine.step(0.01);
 }
+
+// controle do botão
+const toggleBtn = document.querySelector(".min-screen") as HTMLElement;
+const graphContainer = document.querySelector(".container-graph") as HTMLElement;
+
+toggleBtn?.addEventListener("click", () => {
+    graphContainer.classList.toggle("minimized");
+});
