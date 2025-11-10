@@ -171,7 +171,7 @@ export default class Renderer implements SimulationObserver {
             
             const color = batch.color ?? "gray";
 
-            const particle = this.ensureParticle(batch.id, color, Math.round(batch.count));
+            this.ensureParticle(batch.id, color, Math.round(batch.count));
             this.updateParticlePosition(batch);
             activeBatchIds.add(batch.id);
         });
