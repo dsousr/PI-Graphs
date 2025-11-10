@@ -34,14 +34,20 @@ export default class SimulationEngine {
             const count = susceptible + infected + recovered;
             if (count === 0) continue;
 
-            console.log(`Recoverd count: ${recovered}`);
             let color = "gray";
 
-            if (infected > susceptible && infected > recovered) color = "red";
-            else if (susceptible > infected && susceptible > recovered) color = "blue";
-            else if (recovered > infected && recovered > susceptible) color = "green";
+            const max = Math.max(susceptible, infected, recovered);
 
-            if(Math.max(susceptible, infected, recovered) <= 0) color = "gray";
+            // if total population is zero or all values are invalid
+            if (max <= 0) {
+                color = "gray";
+            } else if (infected === max && infected > 0) {
+                color = "red";
+            } else if (susceptible === max && susceptible > 0) {
+                color = "blue";
+            } else if (recovered === max && recovered > 0) {
+                color = "green";
+            }
 
             transitBatches.push({
                 id: flow.id,
