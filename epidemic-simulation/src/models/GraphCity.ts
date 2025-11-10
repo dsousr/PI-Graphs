@@ -79,6 +79,18 @@ export default class GraphCity {
   getAdjacencyView(): ReadonlyMap<Vertex, ReadonlyArray<Edge>> {
     return this.adjacency;
   }
+
+  getAllTransitFlows(): TransitFlow[] {
+      const allFlows: TransitFlow[] = [];
+      for (const edges of this.adjacency.values()) {
+          for (const edge of edges) {
+              if (edge.flows) {
+                  allFlows.push(...edge.flows);
+              }
+          }
+      }
+      return allFlows;
+  }
  
   dfs(init: Vertex, found: Set<Vertex> = new Set()): void {
     if (found.has(init)) return;

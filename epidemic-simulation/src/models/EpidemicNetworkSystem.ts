@@ -10,7 +10,7 @@ export default class EpidemicNetworkSystem {
     private cities = new Map<Vertex, City>();
 
     travelSpeed = 1; // units per time unit
-    private movementInterval: number = 1; // Move every 1 time unit
+    private movementInterval: number = 1; // move every 1 time unit
     private timeSinceLastMovement: number = 0;
     private elapsedTime: number = 0; // Track total time for transit batches
 
@@ -67,20 +67,17 @@ export default class EpidemicNetworkSystem {
         this.elapsedTime += deltaT;
         this.timeSinceLastMovement += deltaT;
         
-        // Only move population when movement interval is reached
+        // update transit batches first (they might complete during this time)
+        this.updateTransitBatches(deltaT);
+        this.deliverTransitBatches();
+        
+        // only create new batches when movement interval is reached
         if (this.timeSinceLastMovement >= this.movementInterval) {
-            this.movePopulation(this.movementInterval);
+            this.createTransitBatches();
             this.timeSinceLastMovement = 0;
         }
         
         this.updateInfections(deltaT);
-    }
-
-    private movePopulation(deltaT: number): void {
-        // deltaT should equal movementInterval
-        this.createTransitBatches();
-        this.updateTransitBatches(deltaT);
-        this.deliverTransitBatches();
     }
 
     private createTransitBatches(): void {
@@ -217,18 +214,6 @@ export default class EpidemicNetworkSystem {
     getGraphSnapshot(): ReadonlyMap<Vertex, ReadonlyArray<Edge>> {
         return this.graph.getAdjacencyView();
     }
-
-    getAllTransitFlows(): TransitFlow[] {
-        const allFlows: TransitFlow[] = [];
-        for (const edges of this.graph.getAdjacencyView().values()) {
-            for (const edge of edges) {
-                if (edge.flows) {
-                    allFlows.push(...edge.flows);
-                }
-            }
-        }
-        return allFlows;
-    }    
 
     print(): void {
         console.log("=== Epidemic System State ===");

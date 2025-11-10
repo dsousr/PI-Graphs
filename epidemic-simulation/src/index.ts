@@ -34,9 +34,18 @@ const extinctionModel = new SIRSModel({
     natalityRate: 2
 });
 
+//
+const nonChagingModel = new SIRSModel({
+    infectionRate: 0,
+    recoveringRate: 0,
+    immunityLossRate: 0,
+    mortalityRate: 0,
+    natalityRate: 0
+});
+
 
 // Added travelSpeed (50 units/day) and movementInterval (1 day)
-const system = new EpidemicNetworkSystem(epidemicModel, 50, 1.0);
+const system = new EpidemicNetworkSystem(nonChagingModel, 50, 1.0);
 system.addCity(new City("A", { susceptible: 900, infected: 10, recovered: 0 }));
 system.addCity(new City("B", { susceptible: 500, infected: 15, recovered: 0 }));
 system.addCity(new City("C", { susceptible: 800, infected: 0, recovered: 0 }));
@@ -52,13 +61,15 @@ system.addEdge("A", "C", 20, 0.01, 0.02);
 //system.addEdge("B", "D", 50);
 
 const engine = new SimulationEngine(system);
-//engine.addObserver(new ConsoleObserver());
+const consoleObserver = new ConsoleObserver("active");
+engine.addObserver(consoleObserver);
+
 
 //engine.addObserver(new Renderer());
 //engine.step(1)
 
 // Movement happens every 1.0 time units, disease updates every 0.01
 // People will travel in batches every day while disease spreads continuously
-for (let i = 0; i < 3000; i += 1) {
+for (let i = 0; i < 110; i += 1) {
     engine.step(0.01);
 }

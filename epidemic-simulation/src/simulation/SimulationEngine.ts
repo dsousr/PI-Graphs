@@ -26,12 +26,10 @@ export default class SimulationEngine {
             .map(c => new City(c.id, c.clonePopulationState()));
 
         const edges = this.system.getGraphSnapshot();
-        const transitFlows = this.system.getAllTransitFlows();
 
         const snapshot: SimulationSnapshot = {
             cities: citiesSnapshot,
             edges,
-            transitFlows,
             elapsedTime: this.elapsedTime,
             model: this.system.model,
         };
@@ -51,7 +49,6 @@ export default class SimulationEngine {
 export interface SimulationSnapshot {
     cities: City[];
     edges: ReadonlyMap<Vertex, ReadonlyArray<Edge>>;
-    transitFlows: TransitFlow[];
     elapsedTime: number; //total "days" elapsed (or any other time unit used)
     model: SIRSModel;
 }
