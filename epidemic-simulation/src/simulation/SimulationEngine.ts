@@ -30,15 +30,18 @@ export default class SimulationEngine {
         // build visualizable batches
         const transitBatches: TransitBatchSnapshot[] = [];
         for (const flow of this.system.getAllTransitBatches()) {
-            const count = flow.groups.susceptible + flow.groups.infected + flow.groups.recovered;
+            const { susceptible, infected, recovered } = flow.groups;
+            const count = susceptible + infected + recovered;
+            if (count === 0) continue;
+
+            console.log(`Recoverd count: ${recovered}`);
             let color = "gray";
-            if (flow.groups.infected > 0 && flow.groups.infected >= Math.max(flow.groups.susceptible, flow.groups.recovered)) {
-                color = "red";
-            } else if (flow.groups.recovered > flow.groups.susceptible) {
-                color = "green";
-            } else if (flow.groups.susceptible > 0) {
-                color = "blue";
-            }
+
+            if (infected > susceptible && infected > recovered) color = "red";
+            else if (susceptible > infected && susceptible > recovered) color = "blue";
+            else if (recovered > infected && recovered > susceptible) color = "green";
+
+            if(Math.max(susceptible, infected, recovered) <= 0) color = "gray";
 
             transitBatches.push({
                 id: flow.id,
