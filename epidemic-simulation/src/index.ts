@@ -45,9 +45,9 @@ const nonChagingModel = new SIRSModel({
 
 
 // Added travelSpeed (50 units/day) and movementInterval (1 day)
-const system = new EpidemicNetworkSystem(nonChagingModel, 50, 1.0);
-system.addCity(new City("A", { susceptible: 900, infected: 10, recovered: 0 }));
-system.addCity(new City("B", { susceptible: 500, infected: 15, recovered: 0 }));
+const system = new EpidemicNetworkSystem(epidemicModel, 50, 1.0);
+system.addCity(new City("A", { susceptible: 5, infected: 500, recovered: 0 }));
+system.addCity(new City("B", { susceptible: 500, infected: 150, recovered: 0 }));
 system.addCity(new City("C", { susceptible: 800, infected: 0, recovered: 0 }));
 //system.addCity(new City("D", 0.05, { susceptible: 1000, infected: 0, recovered: 0 }));
 
@@ -58,18 +58,16 @@ system.addCity(new City("C", { susceptible: 800, infected: 0, recovered: 0 }));
 system.addEdge("A", "B", 40, 0.02, 0.01);
 system.addEdge("B", "C", 30, 0.03, 0);
 system.addEdge("A", "C", 20, 0.01, 0.02);
-//system.addEdge("B", "D", 50);
 
 const engine = new SimulationEngine(system);
 const consoleObserver = new ConsoleObserver("active");
+engine.addObserver(new Renderer());
 engine.addObserver(consoleObserver);
-
-
-//engine.addObserver(new Renderer());
-//engine.step(1)
 
 // Movement happens every 1.0 time units, disease updates every 0.01
 // People will travel in batches every day while disease spreads continuously
-for (let i = 0; i < 110; i += 1) {
-    engine.step(0.01);
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+for (let i = 0; i < 1000; i += 1) {
+    engine.step(0.1);
+    await sleep(500);
 }
