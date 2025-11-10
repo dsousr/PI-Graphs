@@ -10,7 +10,7 @@ import Renderer from "./visualization/Renderer";
 // Epidemic growth (R0 > 1) // 3.33
 const epidemicModel = new SIRSModel({
     infectionRate: 10,
-    recoveringRate: 1,
+    recoveringRate: 0.1,
     immunityLossRate: 0.5,
     mortalityRate: 2,
     natalityRate: 2
@@ -44,9 +44,13 @@ const nonChagingModel = new SIRSModel({
 });
 
 
-const initializeBigNetwork = (sirsModel: SIRSModel): EpidemicNetworkSystem => {
+const initializeBigNetwork = (
+    sirsModel: SIRSModel, 
+    travelSpeed: number, 
+    movimentInterval: number
+): EpidemicNetworkSystem => {
     // added travelSpeed (50 units/day) and movementInterval (1 day/unit, for example)
-    const networkSystem = new EpidemicNetworkSystem(sirsModel, 50, 0.5);
+    const networkSystem = new EpidemicNetworkSystem(sirsModel, travelSpeed, movimentInterval);
     networkSystem.addCity(new City("A", { susceptible: 1800, infected: 150, recovered: 50 }));
     networkSystem.addCity(new City("B", { susceptible: 1200, infected: 600, recovered: 200 }));
     networkSystem.addCity(new City("C", { susceptible: 900, infected: 100, recovered: 0 }));
@@ -72,12 +76,16 @@ const initializeBigNetwork = (sirsModel: SIRSModel): EpidemicNetworkSystem => {
     return networkSystem;
 }
 
-const initializeTinyNetwork = (sirsModel: SIRSModel): EpidemicNetworkSystem => {
+const initializeTinyNetwork = (
+    sirsModel: SIRSModel, 
+    travelSpeed: number, 
+    movimentInterval: number
+): EpidemicNetworkSystem => {
     // added travelSpeed (50 units/day) and movementInterval (ex: 1 day)
-    const networkSystem = new EpidemicNetworkSystem(sirsModel, 50, 0.5);
-    networkSystem.addCity(new City("A", { susceptible: 5, infected: 500, recovered: 0 }));
-    networkSystem.addCity(new City("B", { susceptible: 500, infected: 150, recovered: 0 }));
-    networkSystem.addCity(new City("C", { susceptible: 100, infected: 0, recovered: 0 }));
+    const networkSystem = new EpidemicNetworkSystem(sirsModel, travelSpeed, movimentInterval);
+    networkSystem.addCity(new City("A", { susceptible: 500, infected: 200, recovered: 0 }));
+    networkSystem.addCity(new City("B", { susceptible: 400, infected: 150, recovered: 0 }));
+    networkSystem.addCity(new City("C", { susceptible: 200, infected: 0, recovered: 50 }));
 
     networkSystem.addEdge("A", "B", 100, 0.02, 0);
     networkSystem.addEdge("B", "C", 50, 0.03, 0);
@@ -85,10 +93,12 @@ const initializeTinyNetwork = (sirsModel: SIRSModel): EpidemicNetworkSystem => {
     return networkSystem;
 }
 
-const networkSystem = initializeTinyNetwork(epidemicModel);
+const travelSpeed = 200; // units per delta
+const movementInterval = 0.08; // interval in which people go out to travel
+const networkSystem = initializeTinyNetwork(epidemicModel, travelSpeed, movementInterval);
 const engine = new SimulationEngine(networkSystem);
 engine.addObserver(new Renderer());
-engine.addObserver(new ConsoleObserver("active"));
+engine.addObserver(new ConsoleObserver("total"));
 
 // controle do botão
 const toggleBtn = document.querySelector(".min-screen") as HTMLElement;
@@ -102,6 +112,6 @@ toggleBtn?.addEventListener("click", () => {
 // People will travel in batches every day while disease spreads continuously
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 for (let i = 0; i < 10000; i += 1) {
-    engine.step(0.1);
-    await sleep(100);
+    engine.step(0.0001);
+    await sleep(0.001);
 }
