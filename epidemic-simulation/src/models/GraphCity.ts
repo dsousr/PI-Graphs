@@ -120,4 +120,37 @@ export default class GraphCity {
       }
     }
   }
+
+  bfsLevels(init: Vertex): Map<number, Vertex[]> {
+    const visited = new Set<Vertex>();
+    const queue: Vertex[] = [init];
+    const depthMap = new Map<Vertex, number>(); // store depth of each vertex
+    const levels = new Map<number, Vertex[]>(); // group vertices by level
+
+    visited.add(init);
+    depthMap.set(init, 0);
+    levels.set(0, [init]);
+
+    while (queue.length > 0) {
+      const vertex = queue.shift()!;
+      const currentDepth = depthMap.get(vertex)!;
+
+      for (const { neighbor } of this.getNeighbors(vertex)) {
+        if (!visited.has(neighbor)) {
+          visited.add(neighbor);
+          queue.push(neighbor);
+
+          const neighborDepth = currentDepth + 1;
+          depthMap.set(neighbor, neighborDepth);
+
+          if (!levels.has(neighborDepth)) {
+            levels.set(neighborDepth, []);
+          }
+          levels.get(neighborDepth)!.push(neighbor);
+        }
+      }
+    }
+
+    return levels;
+  }  
 }

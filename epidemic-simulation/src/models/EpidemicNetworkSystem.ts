@@ -219,6 +219,10 @@ export default class EpidemicNetworkSystem {
         return this.graph.getAdjacencyView();
     }
 
+    getDepthLevels(startId: Vertex): Map<number, Vertex[]> {
+        return this.graph.bfsLevels(startId);
+    }
+
     print(): void {
         console.log("=== Epidemic System State ===");
 
