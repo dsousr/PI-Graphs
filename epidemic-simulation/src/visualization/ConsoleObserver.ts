@@ -1,7 +1,7 @@
 import type { SimulationObserver, SimulationSnapshot } from "../simulation/SimulationEngine";
 import type { TransitFlow, Edge, Vertex } from "../models/GraphCity";
 
-export type PrintMode = "daily" | "active";
+export type PrintMode = "daily" | "active" | "total";
 
 export default class ConsoleObserver implements SimulationObserver {
     private readonly mode: PrintMode;
@@ -12,16 +12,45 @@ export default class ConsoleObserver implements SimulationObserver {
 
     update(snapshot: SimulationSnapshot): void {
         const activeFlows = this.collectTransitFlows(snapshot.edges);
+
         const shouldPrint =
-            this.mode === "daily" || (this.mode === "active" && activeFlows.length > 0);
+            this.mode === "daily" ||
+            (this.mode === "active" && activeFlows.length > 0) ||
+            this.mode === "total";
 
         if (!shouldPrint) return;
 
-        this.printHeader(snapshot.elapsedTime, snapshot.model.getBasicReproductionNumber());
-        this.printCityStates(snapshot.cities);
-        this.printConnections(snapshot.edges);
-        this.printTransitFlows(activeFlows);
-        this.printFooter();
+        if (this.mode === "total") {
+            this.printTotals(snapshot.cities, activeFlows);
+        } else {
+            this.printHeader(snapshot.elapsedTime, snapshot.model.getBasicReproductionNumber());
+            this.printCityStates(snapshot.cities);
+            this.printConnections(snapshot.edges);
+            this.printTransitFlows(activeFlows);
+            this.printFooter();
+        }
+    }
+
+    private printTotals(cities: SimulationSnapshot["cities"], flows: TransitFlow[]): void {
+        let totalS = 0, totalI = 0, totalR = 0;
+
+        // Sum city populations
+        for (const city of cities) {
+            totalS += city.groups.susceptible;
+            totalI += city.groups.infected;
+            totalR += city.groups.recovered;
+        }
+
+        // Sum people currently in transit
+        for (const flow of flows) {
+            totalS += flow.groups.susceptible;
+            totalI += flow.groups.infected;
+            totalR += flow.groups.recovered;
+        }
+
+        console.log(`\n====== Total Epidemic Status ======`);
+        console.log(`S=${totalS.toFixed(0)}, I=${totalI.toFixed(0)}, R=${totalR.toFixed(0)}`);
+        console.log("=====================\n");
     }
 
     private printHeader(elapsedTime: number, R0: number): void {

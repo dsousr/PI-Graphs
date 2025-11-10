@@ -54,6 +54,9 @@ export default class Renderer implements SimulationObserver {
         const dstPos = this.cy.getElementById(batch.target).renderedPosition();
 
         const progress = Math.min(1, Math.max(0, batch.elapsedTime / batch.travelTime));
+
+        if (progress >= 0.90) return;
+
         const x = srcPos.x + (dstPos.x - srcPos.x) * progress;
         const y = srcPos.y + (dstPos.y - srcPos.y) * progress;
 
@@ -180,9 +183,28 @@ export default class Renderer implements SimulationObserver {
         this.removeInactiveBatches(activeBatchIds);
 
         //Para usar no chart.js
-        const totalSusceptible = snapshot.cities.reduce((acc, c) => acc + c.groups.susceptible, 0);
-        const totalInfected = snapshot.cities.reduce((acc, c) => acc + c.groups.infected, 0);
-        const totalRecovered = snapshot.cities.reduce((acc, c) => acc + c.groups.recovered, 0);
+        let totalSusceptible = 0;
+        let totalInfected = 0; 
+        let totalRecovered = 0;
+
+        // people in cities
+        snapshot.cities.forEach(c => {
+            totalSusceptible += c.groups.susceptible;
+            totalInfected += c.groups.infected;
+            totalRecovered += c.groups.recovered;
+        });
+
+        // people currently in transit
+        for (const edgeFlows of snapshot.edges.values()) {
+            for (const edge of edgeFlows) {
+                if (!edge.flows) continue;
+                for (const flow of edge.flows) {
+                    totalSusceptible += flow.groups.susceptible;
+                    totalInfected += flow.groups.infected;
+                    totalRecovered += flow.groups.recovered;
+                }
+            }
+        }
 
         //para não poluir o gráfico
         if (Math.abs(snapshot.elapsedTime % 1) < 0.001) {
