@@ -78,6 +78,7 @@ toggleBtn?.addEventListener("click", () => {
 // People will travel in batches every day while disease spreads continuously
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 for (let i = 0; i < 1000; i += 1) {
-    engine.step(0.1);
+    engine.step(0.05);
     await sleep(500);
+
 }

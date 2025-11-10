@@ -31,8 +31,8 @@ export default class Renderer implements SimulationObserver {
             particle = document.createElement("div");
             particle.className = "particle";
             particle.style.position = "absolute";
-            particle.style.width = "24px";
-            particle.style.height = "24px";
+            particle.style.width = "30px";
+            particle.style.height = "30px";
             particle.style.borderRadius = "50%";
             particle.style.display = "flex";
             particle.style.alignItems = "center";
@@ -168,12 +168,51 @@ export default class Renderer implements SimulationObserver {
         // Render active batches
         const activeBatchIds = new Set<string>();
         snapshot.transitBatches.forEach((batch: any) => {
+            
             const color = batch.color ?? "gray";
+
             const particle = this.ensureParticle(batch.id, color, Math.round(batch.count));
             this.updateParticlePosition(batch);
             activeBatchIds.add(batch.id);
         });
 
         this.removeInactiveBatches(activeBatchIds);
+
+        //Para usar no chart.js
+        const totalSusceptible = snapshot.cities.reduce((acc, c) => acc + c.groups.susceptible, 0);
+        const totalInfected = snapshot.cities.reduce((acc, c) => acc + c.groups.infected, 0);
+        const totalRecovered = snapshot.cities.reduce((acc, c) => acc + c.groups.recovered, 0);
+
+        //para não poluir o gráfico
+        if (Math.abs(snapshot.elapsedTime % 1) < 0.001) {
+            this.dataHistory.labels.push(snapshot.elapsedTime.toFixed(0)); // mostra "1", "2", "3", etc.
+            this.dataHistory.susceptible.push(totalSusceptible);
+            this.dataHistory.infected.push(totalInfected);
+            this.dataHistory.recovered.push(totalRecovered);
+
+            // Mantém o gráfico com no máximo 100 pontos visíveis
+            if (this.dataHistory.labels.length > 100) {
+                this.dataHistory.labels.shift();
+                this.dataHistory.susceptible.shift();
+                this.dataHistory.infected.shift();
+                this.dataHistory.recovered.shift();
+            }
+
+            this.chart.data.labels = this.dataHistory.labels;
+            this.chart.data.datasets[0].data = this.dataHistory.susceptible;
+            this.chart.data.datasets[1].data = this.dataHistory.infected;
+            this.chart.data.datasets[2].data = this.dataHistory.recovered;
+            this.chart.update("none"); // sem animação
+        }
+
+        // Atualizar os blocos
+        const greenBlock = document.querySelector(".b-green") as HTMLElement;
+        const redBlock = document.querySelector(".b-red") as HTMLElement;
+        const blueBlock = document.querySelector(".b-blue") as HTMLElement;
+
+        if (greenBlock) greenBlock.textContent = `${Math.round(totalRecovered)}`;
+        if (redBlock) redBlock.textContent = `${Math.round(totalInfected)}`;
+        if (blueBlock) blueBlock.textContent = `${Math.round(totalSusceptible)}`;
+
     }
 }
