@@ -95,10 +95,13 @@ const initializeTinyNetwork = (
 
 const travelSpeed = 200; // units per delta
 const movementInterval = 0.08; // interval in which people go out to travel
-const networkSystem = initializeTinyNetwork(epidemicModel, travelSpeed, movementInterval);
+const networkSystem = initializeBigNetwork(epidemicModel, travelSpeed, movementInterval);
+//const networkSystem = initializeTinyNetwork(epidemicModel, travelSpeed, movementInterval);
 const engine = new SimulationEngine(networkSystem);
 engine.addObserver(new Renderer());
-engine.addObserver(new ConsoleObserver("total"));
+const depthLevel = networkSystem.getDepthLevels("A");
+console.log("Depth levels from A:", depthLevel);
+//engine.addObserver(new ConsoleObserver("total"));
 
 // controle do botão
 const toggleBtn = document.querySelector(".min-screen") as HTMLElement;
